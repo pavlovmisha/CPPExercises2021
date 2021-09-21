@@ -105,7 +105,13 @@ void task3() {
         if(i<0){
             break;
         }
+        if(i>=n){
+            break;
+        }
         std::cin>>j;
+        if(j>=m){
+            break;
+        }
         if(j<0){
             break;
         }
@@ -132,13 +138,41 @@ void task3() {
                 if(array[q][w]==1){
                     z[q]++;
                 }// взяли j-ую строку, а из нее - i-ый элемент
-                // выведите в консоль это число
-
             }
         }
+        int p=0;
+        for(int q = 0;q < z.size();q++){
+            if(z[q]==m){
+                std::cout << "OX-XO-XO" << std::endl;
+                p++;
+            }
+        }
+        if(p>0){
+            break;
+        }
         // TODO 41 добавьте проверку что если пользователь заполнил единицами хотя бы одну колонку - то выводится сообщение "AX-XA-XA" и программа завершается
-    }
+        std::vector<int> v;
+        v.resize(m);
+        for (int q = 0; q < array.size(); ++q) { // пробегаем по каждой строке
 
+            int e = array[q].size(); // узнаем число элементов в текущей строке
+            for (int w = 0; w < e; ++w) {
+                if(array[q][w]==1){
+                    v[w]++;
+                }// взяли j-ую строку, а из нее - i-ый элемент
+            }
+        }
+        int o=0;
+        for(int q = 0;q < v.size();q++){
+            if(v[q]==n){
+                std::cout << "AX-XA-XA" << std::endl;
+                o++;
+            }
+        }
+        if(o>0){
+            break;
+        }
+    }
 }
 
 
