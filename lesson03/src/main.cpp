@@ -1,10 +1,19 @@
 #include <iostream>
 #include <filesystem> // это нам понадобится чтобы создать папку для результатов
 #include <libutils/rasserts.h>
-
+#include <vector>
+#include <algorithm>
+#include <random>
+#include <ctime>
 #include "helper_functions.h"
+#include <chrono>
+#include <thread>
 
 #include <opencv2/highgui.hpp> // подключили часть библиотеки OpenCV, теперь мы можем читать и сохранять картинки
+using namespace std;
+using namespace cv;
+
+cv::Mat getanime(Mat mat, Mat mat1, int n);
 
 void task1() {
     cv::Mat imgUnicorn = cv::imread("lesson03/data/unicorn.png");  // загружаем картинку с единорогом
@@ -43,7 +52,11 @@ void task1() {
     cv::imwrite(filename4, unicornInLargeCastle);
     // TODO сохраните результат - "04_unicorn_large_castle.jpg"
 
-    // TODO сделайте то же самое, но теперь пусть единорог рисуется N раз (случайно выбранная переменная от 0 до 100)
+    cv::Mat imgUnicorn5 = cv::imread("lesson03/data/unicorn.png").clone();
+    cv::Mat largeCastle2 = cv::imread("lesson03/data/castle_large.jpg").clone();//
+    srand((int) time(NULL));
+    int N=rand()%((int) 101);
+    cv::Mat unicornInCastle2 = getanime(imgUnicorn.clone(), largeCastle.clone(), N);
     // функцию вам придется объявить самостоятельно, включая:
     // 1) придумывание ее имени
     // 2) добавление декларации в helper_functions.h (три аргумента - объект, фон, число рисований объекта)
@@ -51,8 +64,13 @@ void task1() {
     // 4) как генерировать случайные числа - найдите самостоятельно через гугл, например "c++ how to random int"
     // 5) при этом каждый единорог рисуется по случайным координатам
     // 6) результат сохраните - "05_unicorns_otake.jpg"
+    filename = resultsDir + "05_unicorns_otake.jpg"; // удобно в начале файла писать число, чтобы файлы были в том порядке в котором мы их создали
+    cv::imwrite(filename, unicornInCastle2);
+    // растяните картинку единорога так, чтобы она заполнила полностью большую картинку с замком "06_unicorn_upscale.jpg"
 
-    // TODO растяните картинку единорога так, чтобы она заполнила полностью большую картинку с замком "06_unicorn_upscale.jpg"
+}
+
+
 }
 
 void task2() {

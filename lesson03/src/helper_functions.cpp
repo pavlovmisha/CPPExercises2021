@@ -1,8 +1,12 @@
 #include "helper_functions.h"
 
 #include <libutils/rasserts.h>
-
-
+#include <random>
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+using namespace cv;
 cv::Mat makeAllBlackPixelsBlue(cv::Mat image) {
     // TODO реализуйте функцию которая каждый черный пиксель картинки сделает синим
 
@@ -87,23 +91,54 @@ cv::Mat addBackgroundInsteadOfBlackPixels(cv::Mat object, cv::Mat background) {
 
 cv::Mat addBackgroundInsteadOfBlackPixelsLargeBackground(cv::Mat object, cv::Mat largeBackground) {
     // теперь вам гарантируется что largeBackground гораздо больше - добавьте проверок этого инварианта (rassert-ов)
-    for(int j=0;j<101;j++){
-        for(int i=0;i<101;i++){
-            cv::Vec3b color = object.at<cv::Vec3b>(j, i); // взяли и узнали что за цвет в пикселе в 14-ом ряду (т.к. индексация с нуля) и 6-ой колонке
+    for (int j = 0; j < 101; j++) {
+        for (int i = 0; i < 101; i++) {
+            cv::Vec3b color = object.at<cv::Vec3b>(j,
+                                                   i); // взяли и узнали что за цвет в пикселе в 14-ом ряду (т.к. индексация с нуля) и 6-ой колонке
             unsigned char blue = color[0]; // если это число равно 255 - в пикселе много синего, если равно 0 - в пикселе нет синего
             unsigned char green = color[1];
             unsigned char red = color[2];
-            cv::Vec3b color1 = largeBackground.at<cv::Vec3b>(j+245, i+586); // взяли и узнали что за цвет в пикселе в 14-ом ряду (т.к. индексация с нуля) и 6-ой колонке
+            cv::Vec3b color1 = largeBackground.at<cv::Vec3b>(j + 255, i +
+                                                                      586); // взяли и узнали что за цвет в пикселе в 14-ом ряду (т.к. индексация с нуля) и 6-ой колонке
             unsigned char blue1 = color1[0]; // если это число равно 255 - в пикселе много синего, если равно 0 - в пикселе нет синего
             unsigned char green1 = color1[1];
             unsigned char red1 = color1[2];
-            red1=red;
-            blue1=blue;
-            green1=green;
-            largeBackground.at<cv::Vec3b>(j+245, i=586) = cv::Vec3b(blue1, green1, red1);
+            if ((red > 4) || (green > 4) || (blue > 4)) {
+                red1 = red;
+                green1 = green;
+                blue1 = blue;
+            }
+            largeBackground.at<cv::Vec3b>(j + 245, i = 586) = cv::Vec3b(blue1, green1, red1);
         }
     }
-    // TODO реализуйте функцию так, чтобы нарисовался объект ровно по центру на данном фоне, при этом черные пиксели объекта не должны быть нарисованы
-
-    return largeBackground;
+    return object;
 }
+    // TODO реализуйте функцию так, чтобы нарисовался объект ровно по центру на данном фоне, при этом черные пиксели объекта не должны быть нарисованы
+    cv::Mat getanime(cv::Mat object, cv::Mat largeBackground, int n) {
+        rassert(largeBackground.rows > object.rows, "ti tupoi schto li?");
+        rassert(largeBackground.cols > object.cols, "ti tupoi schto li?");
+        for (int cyc = 0; cyc < n; ++cyc) {
+            int ox = largeBackground.rows - object.rows;
+            int oy = largeBackground.cols - object.cols;
+            int x = rand() % (ox + 1);
+            int y = rand() % (oy + 1);
+            for (int i = 0; i < object.rows; ++i) {
+                for (int j = 0; j < object.cols; ++j) {
+                    cv::Vec3b color = object.at<cv::Vec3b>(i, j);
+                    cv::Vec3b &color2 = largeBackground.at<cv::Vec3b>(x + i, y + j);
+                    unsigned char blue = color[0]; // если это число равно 255 - в пикселе много синего, если равно 0 - в пикселе нет синего
+                    unsigned char green = color[1];
+                    unsigned char red = color[2];
+                    if ((blue + green + red) >= 100) {
+                        color2[0] = blue;
+                        color2[1] = green;
+                        color2[2] = red;
+                    }
+                }
+            }
+        }
+        return largeBackground;
+    }
+
+
+
