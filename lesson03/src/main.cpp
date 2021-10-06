@@ -64,14 +64,13 @@ void task1() {
     // 4) как генерировать случайные числа - найдите самостоятельно через гугл, например "c++ how to random int"
     // 5) при этом каждый единорог рисуется по случайным координатам
     // 6) результат сохраните - "05_unicorns_otake.jpg"
-    filename = resultsDir + "05_unicorns_otake.jpg"; // удобно в начале файла писать число, чтобы файлы были в том порядке в котором мы их создали
-    cv::imwrite(filename, unicornInCastle2);
+    std::string filename5 = resultsDir + "05_unicorn_otake.jpg"; // удобно в начале файла писать число, чтобы файлы были в том порядке в котором мы их создали
+    cv::imwrite(filename5, unicornInCastle2);
     // растяните картинку единорога так, чтобы она заполнила полностью большую картинку с замком "06_unicorn_upscale.jpg"
 
 }
 
 
-}
 
 void task2() {
     cv::Mat imgUnicorn = cv::imread("lesson03/data/unicorn.png");
