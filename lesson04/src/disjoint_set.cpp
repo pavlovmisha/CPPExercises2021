@@ -10,7 +10,7 @@ DisjointSet::DisjointSet(int size)
     sizes = std::vector<int>(size);
     for(int i=0;i<size;++i){
         parents[i]=-1;
-        ranks[i]=1;
+        ranks[i]=0;
         sizes[i]=1;
     }
     // TODO - заполните вектора так чтобы на этапе конструирования эта система непересекающихся множеств состояла из:
@@ -26,12 +26,10 @@ int	DisjointSet::get_set(int element)
     // TODO по номеру элемента нужно переходя по ссылкам на родителя дойти до самого верхнего элемента,
     // номер этого корневого элемента - номер множества на данный момент (кто вверху тот и главный, множество названо в его честь)
     int q=parents[element];
-    if(q==-1){
-        first_of_their_kind=element;
-    }else{
-        q= get_set(q);
+    while(q!=-1){
+        first_of_their_kind=q;
+        q=parents[q];
     }
-
     return first_of_their_kind;
 }
 
@@ -40,7 +38,9 @@ int DisjointSet::count_differents() const
     // TODO посчитать сколько разных множеств (подсказка: в каждом множестве ровно один корень, а корень - это тот у кого родитель = ROOT)
     int count = 0;
     for (size_t i = 0; i < this->parents.size(); i++) {
-        // ...
+        if(parents[i]==-1){
+            count++;
+        }
     }
     return count;
 }
@@ -48,7 +48,7 @@ int DisjointSet::count_differents() const
 int DisjointSet::get_set_size(int element)
 {
     // TODO сообщить сколько элементов в множестве, которому принадлежит данный элемент (да, это очень просто)
-    return 0;
+    return sizes[get_set(element)];
 }
 
 int	DisjointSet::union_sets(int element0, int element1)
@@ -57,6 +57,19 @@ int	DisjointSet::union_sets(int element0, int element1)
     // кого из них подвесить к другому (тем самым объединить два множества)
     // при этом стоит подвешивать менее высокое дерево к более высокому (т.е. учитывая ранк),
     // а так же важно не забыть после переподвешивания у корневого элемента обновить ранк и размер множества
-
-    return 0; // вернуть номер объединенного множества
+    int a = get_set(element0);
+    int b = get_set(element1);
+    if(ranks[a]>ranks[b]){
+        parents[b]=a;
+        sizes[a]=sizes[a]+sizes[b];
+        return a;
+    }else{
+        parents[a]=b;
+        sizes[b]=sizes[a]+sizes[b];
+        if(ranks[a]=ranks[b]){
+            ranks[b]++;
+        }
+        return b;
+    }
+     // вернуть номер объединенного множества
 }

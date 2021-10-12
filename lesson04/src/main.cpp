@@ -11,6 +11,7 @@
 // чтобы их потестировать - постарайтесь дописать сюда много разных интересных случаев:
 void testingMyDisjointSets() {
     DisjointSet set(5);
+
     rassert(set.count_differents() == 5, 2378923791);
     for (int element = 0; element < 5; ++element) {
         rassert(set.get_set(element) == element, 23892803643);
