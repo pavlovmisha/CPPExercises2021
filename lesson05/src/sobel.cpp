@@ -1,7 +1,8 @@
 #include "sobel.h"
 
 #include <libutils/rasserts.h>
-
+#include <opencv2/highgui.hpp>
+#include <iostream>
 
 cv::Mat convertBGRToGray(cv::Mat img) {
     int height = img.rows;
@@ -24,7 +25,7 @@ cv::Mat convertBGRToGray(cv::Mat img) {
             //  - обратите внимание что если складывать unsigned char - сумма может переполниться, поэтому перед сложением их стоит преобразовать в int или float
             //  - загуглите "RGB to grayscale formula" - окажется что правильно это делать не усреднением в равных пропорциях, а с другими коэффициентами
             float grayIntensity = 0.0f;
-
+            grayIntensity = 0.299*red + 0.587*green + 0.114*blue;
             grayscaleImg.at<float>(j, i) = grayIntensity;
         }
     }
@@ -34,6 +35,7 @@ cv::Mat convertBGRToGray(cv::Mat img) {
 
 
 cv::Mat sobelDXY(cv::Mat img) {
+    img = convertBGRToGray(img.clone());
     int height = img.rows;
     int width = img.cols;
     cv::Mat dxyImg(height, width, CV_32FC2); // в этой картинке мы сохраним обе производные:
@@ -48,6 +50,7 @@ cv::Mat sobelDXY(cv::Mat img) {
     // производную неприятно брать по трем каналам (по трем BGR-цветам),
     // поэтому переданная картинка должна быть черно-белой (оттенки серого)
     // удостоверимся в этом (32-битное вещественное число: 32F + всего 1 канал (channel): C1):
+
     rassert(img.type() == CV_32FC1, 23781792319049);
 
     // реализуйте оператор Собеля - заполните dxy
@@ -62,26 +65,35 @@ cv::Mat sobelDXY(cv::Mat img) {
 
     // TODO исправьте коээфициенты свертки по вертикальной оси y
     int dySobelKoef[3][3] = {
+            {-1, -2, -1},
             {0, 0, 0},
-            {0, 0, 0},
-            {0, 0, 0},
+            {1, 2, 1},
     };
 
     // TODO доделайте этот код (в т.ч. производную по оси ty), в нем мы пробегаем по всем пикселям (j,i)
-    for (int j = 0; j < height; ++j) {
-        for (int i = 0; i < width; ++i) {
+    for (int j = 1; j < height-1; ++j) {
+        for (int i = 1; i < width-1; ++i) {
             float dxSum = 0.0f; // судя будем накапливать производную по оси x
-
+            float dySum = 0.0f;
             // затем пробегаем по окрестности 3x3 вокруг нашего центрального пикселя (j,i)
             for (int dj = -1; dj <= 1; ++dj) {
                 for (int di = -1; di <= 1; ++di) {
                     float intensity = img.at<float>(j + dj, i + di); // берем соседний пиксель из окрестности
                     dxSum += dxSobelKoef[1 + dj][1 + di] * intensity; // добавляем его яркость в производную с учетом веса из ядра Собеля
+                    dySum += dySobelKoef[1 + dj][1 + di] * intensity;
                 }
             }
 
-            dxyImg.at<cv::Vec2f>(j, i) = cv::Vec2f(0.0f, 0.0f);
+            dxyImg.at<cv::Vec2f>(j, i) = cv::Vec2f(dxSum, dySum);
         }
+    }
+    for(int j=0; j < height; ++j){
+        dxyImg.at<cv::Vec2f>(j, 0) = cv::Vec2f(0.0f, 0.0f);
+        dxyImg.at<cv::Vec2f>(j, width) = cv::Vec2f(0.0f, 0.0f);
+    }
+    for(int i=0; i < width; ++i){
+        dxyImg.at<cv::Vec2f>(0, i) = cv::Vec2f(0.0f, 0.0f);
+        dxyImg.at<cv::Vec2f>(height, i) = cv::Vec2f(0.0f, 0.0f);
     }
 
     return dxyImg; // производная по оси x и оси y (в каждом пикселе два канала - два числа - каждая из компонент производной)
