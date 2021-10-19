@@ -87,21 +87,20 @@ cv::Mat sobelDXY(cv::Mat img) {
             dxyImg.at<cv::Vec2f>(j, i) = cv::Vec2f(dxSum, dySum);
         }
     }
-    for(int j=0; j < height; ++j){
+    for(int j=0; j < height-1; ++j){
         dxyImg.at<cv::Vec2f>(j, 0) = cv::Vec2f(0.0f, 0.0f);
-        dxyImg.at<cv::Vec2f>(j, width) = cv::Vec2f(0.0f, 0.0f);
+        dxyImg.at<cv::Vec2f>(j, width-1) = cv::Vec2f(0.0f, 0.0f);
     }
-    for(int i=0; i < width; ++i){
+    for(int i=0; i < width-1; ++i){
         dxyImg.at<cv::Vec2f>(0, i) = cv::Vec2f(0.0f, 0.0f);
-        dxyImg.at<cv::Vec2f>(height, i) = cv::Vec2f(0.0f, 0.0f);
+        dxyImg.at<cv::Vec2f>(height-1, i) = cv::Vec2f(0.0f, 0.0f);
     }
 
     return dxyImg; // производная по оси x и оси y (в каждом пикселе два канала - два числа - каждая из компонент производной)
 }
 
 cv::Mat convertDXYToDX(cv::Mat img) {
-    rassert(img.type() == CV_32FC2,
-            238129037129092); // сверяем что в картинке два канала и в каждом - вещественное число
+    rassert(img.type() == CV_32FC2,238129037129092); // сверяем что в картинке два канала и в каждом - вещественное число
     int width = img.cols;
     int height = img.rows;
     cv::Mat dxImg(height, width, CV_32FC1); // создаем одноканальную картинку состоящую из 32-битных вещественных чисел
@@ -119,11 +118,34 @@ cv::Mat convertDXYToDX(cv::Mat img) {
 
 cv::Mat convertDXYToDY(cv::Mat img) {
     // TODO
-    cv::Mat dyImg;
+    int width = img.cols;
+    int height = img.rows;
+    cv::Mat dyImg(height, width, CV_32FC1); // создаем одноканальную картинку состоящую из 32-битных вещественных чисел
+    for (int j = 0; j < height; ++j) {
+        for (int i = 0; i < width; ++i) {
+            cv::Vec2f dxy = img.at<cv::Vec2f>(j, i);
+
+            float y = std::abs(dxy[1]); // взяли абсолютное значение производной по оси x
+
+            dyImg.at<float>(j, i) = y;
+        }
+    }
     return dyImg;
 }
 
 cv::Mat convertDXYToGradientLength(cv::Mat img) {
+    int width = img.cols;
+    int height = img.rows;
+    cv::Mat gradient(height, width, CV_32FC1); // создаем одноканальную картинку состоящую из 32-битных вещественных чисел
+    for (int j = 0; j < height; ++j) {
+        for (int i = 0; i < width; ++i) {
+            cv::Vec2f dxy = img.at<cv::Vec2f>(j, i);
+
+            float x = std::abs(dxy[0]); // взяли абсолютное значение производной по оси x
+            float y = std::abs(dxy[1]);
+            gradient.at<float>(j, i) = sqrt(x*x+y*y);
+        }
+    }
     // TODO реализуйте функцию которая считает силу градиента в каждом пикселе
     // точнее - его длину, ведь градиент - это вектор (двухмерный, ведь у него две компоненты), а у вектора всегда есть длина - sqrt(x^2+y^2)
     // TODO и удостоверьтесь что результат выглядит так как вы ожидаете, если нет - спросите меня
