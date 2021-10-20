@@ -87,11 +87,11 @@ cv::Mat sobelDXY(cv::Mat img) {
             dxyImg.at<cv::Vec2f>(j, i) = cv::Vec2f(dxSum, dySum);
         }
     }
-    for(int j=0; j < height-1; ++j){
+    for(int j=0; j < height; ++j){
         dxyImg.at<cv::Vec2f>(j, 0) = cv::Vec2f(0.0f, 0.0f);
         dxyImg.at<cv::Vec2f>(j, width-1) = cv::Vec2f(0.0f, 0.0f);
     }
-    for(int i=0; i < width-1; ++i){
+    for(int i=0; i < width; ++i){
         dxyImg.at<cv::Vec2f>(0, i) = cv::Vec2f(0.0f, 0.0f);
         dxyImg.at<cv::Vec2f>(height-1, i) = cv::Vec2f(0.0f, 0.0f);
     }
@@ -143,11 +143,11 @@ cv::Mat convertDXYToGradientLength(cv::Mat img) {
 
             float x = std::abs(dxy[0]); // взяли абсолютное значение производной по оси x
             float y = std::abs(dxy[1]);
-            gradient.at<float>(j, i) = sqrt(x*x+y*y);
+            gradient.at<float>(j, i) = std::sqrt(x*x+y*y);
         }
     }
     // TODO реализуйте функцию которая считает силу градиента в каждом пикселе
     // точнее - его длину, ведь градиент - это вектор (двухмерный, ведь у него две компоненты), а у вектора всегда есть длина - sqrt(x^2+y^2)
     // TODO и удостоверьтесь что результат выглядит так как вы ожидаете, если нет - спросите меня
-    return img;
+    return gradient;
 }
