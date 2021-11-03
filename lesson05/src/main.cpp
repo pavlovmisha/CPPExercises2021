@@ -1,5 +1,7 @@
 #include <filesystem>
 #include <iostream>
+using namespace std;
+
 #include <libutils/rasserts.h>
 
 #include "sobel.h"
@@ -42,6 +44,7 @@ void testSobel(const std::string &name) {
 }
 
 int main() {
+
     try {
         testBGRToGray();
 
@@ -64,3 +67,4 @@ int main() {
         return 1;
     }
 }
+
