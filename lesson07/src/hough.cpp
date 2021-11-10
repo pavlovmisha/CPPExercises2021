@@ -37,29 +37,37 @@ cv::Mat buildHough(cv::Mat sobel) {// единственный аргумент 
             // теперь для текущего пикселя надо найти все возможные прямые которые через него проходят
             // переберем параметр theta по всему возможному диапазону (в градусах):
 
-            for (int theta0 = 0; theta0 < max_theta; ++theta0) {
+            for (int theta0 = 0; theta0 < max_theta-1; ++theta0) {
                 //  рассчитайте на базе информации о том какие координаты у пикселя - (x0, y0) и какой параметр theta0 мы сейчас рассматриваем
                 //  обратите внимание что функции sin/cos принимают углы в радианах, поэтому сначала нужно пересчитать theta0 в радианы (воспользуйтесь константой PI)
                 const double PI = 3.14159265358979323846264338327950288;
                 double th=(theta0+0.0)/(max_theta+0.0)*2*PI;
                 float r0 = x0*cos(th)+y0*sin(th);
+                double th1=(theta0+1.0)/(max_theta+0.0)*2*PI;
+                float r1 = x0*cos(th1)+y0*sin(th1);
                 //  теперь рассчитайте координаты пикслея в пространстве Хафа (в картинке-аккумуляторе) соответсвующего параметрам theta0, r0
-                int i = theta0;
-                int j = ((r0+0.0)/z)*max_r;
-                if(j>=max_r || j<0) continue;
+                for(int k=std::min(r0,r1);k<std::max(r0,r1);k++){
+                    int i = theta0;
+                    int j = ((k+0.0)/z)*max_r;
+                    if(j>=max_r || j<0) continue;
+                    rassert(i >= 0, 237891731289044);
+                    rassert(i < accumulator.cols, 237891731289045);
+                    rassert(j >= 0, 237891731289046);
+                    rassert(j < accumulator.rows, 237891731289047);
+                    accumulator.at<float>(j, i) += strength;
+                    accumulator.at<float>(j, i+1) += strength;
+                }
+
 
                 // чтобы проверить не вышли ли мы за пределы картинки-аккумулятора - давайте явно это проверим:
-                rassert(i >= 0, 237891731289044);
-                rassert(i < accumulator.cols, 237891731289045);
-                rassert(j >= 0, 237891731289046);
-                rassert(j < accumulator.rows, 237891731289047);
+
                 // теперь легко отладить случай выхода за пределы картинки
                 //  просто поставьте точку остановки внутри rassert:
                 // нажмите Ctrl+Shift+N -> rasserts.cpp
                 // и поставьте точку остановки на 8 строке: "return line;"
 
                 //  и добавьте в картинку-аккумулятор наш голос с весом strength (взятый из картинки свернутой Собелем)
-                accumulator.at<float>(j, i) += strength;
+
             }
         }
     }
