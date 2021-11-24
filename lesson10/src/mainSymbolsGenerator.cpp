@@ -120,6 +120,8 @@ void experiment1() {
                 cv::Mat a = cv::imread(letterDir + "/" + std::to_string(sampleA) + ".png");
                 cv::Mat b = cv::imread(letterDir + "/" + std::to_string(sampleB) + ".png");
                 HoG hogA = buildHoG(a);
+                HoG hogB = buildHoG(b);
+
                 // TODO
             }
         }
