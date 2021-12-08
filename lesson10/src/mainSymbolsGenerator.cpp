@@ -150,6 +150,8 @@ void experiment2() {
     //  - Можно ли с этим что-то сделать?
 
     std::cout << "________Experiment 2________" << std::endl;
+    double dist =0.0;
+    double n =0.0;
     for (char letterA = 'a'; letterA <= 'z'; ++letterA) {
         std::string letterDirA = LETTER_DIR_PATH + "/" + letterA;
         char letterMax;
@@ -158,9 +160,9 @@ void experiment2() {
         double distMin = 1.0;
         for (char letterB = 'a'; letterB <= 'z'; ++letterB) {
             if (letterA == letterB) continue;
-
-            cv::Mat a = cv::imread(letterDirA + "/" + std::to_string(letterA) + ".png");
-            cv::Mat b = cv::imread(letterDirA + "/" + std::to_string(letterB) + ".png");
+            std::string tmp = letterDirA + "/" + std::to_string(letterA) + ".png";
+            cv::Mat a = cv::imread(letterDirA + "/" + std::to_string(2) + ".png");
+            cv::Mat b = cv::imread(letterDirA + "/" + std::to_string(2) + ".png");
             HoG hogA = buildHoG(a);
             HoG hogB = buildHoG(b);
             if(distance(hogA, hogB)>distMax){
@@ -173,9 +175,11 @@ void experiment2() {
             }
             // TODO
         }
-
+        dist = dist + distMin;
+        n++;
         std::cout << "Letter " << letterA << ": max=" << letterMax << "/" << distMax << ", min=" << letterMin << "/" << distMin << std::endl;
     }
+    std::cout << dist/n << std::endl;
 }
 
 

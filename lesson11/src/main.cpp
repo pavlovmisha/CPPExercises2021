@@ -20,17 +20,17 @@ cv::Mat drawContours(int rows, int cols, std::vector<std::vector<cv::Point>> con
     cv::Mat blackImage(rows, cols, CV_8UC3, cv::Scalar(0, 0, 0));
     // теперь мы на ней хотим нарисовать контуры
     cv::Mat imageWithContoursPoints = blackImage.clone();
-//    for (int contourI = 0; contourI < contoursPoints.size(); ++contourI) {
-//        // сейчас мы смотрим на контур номер contourI
-//
-//        cv::Scalar contourColor = randColor(); // выберем для него случайный цвет
-//        std::vector<cv::Point> points = contoursPoints[???]; // TODO 06 вытащите вектор из точек-пикселей соответствующих текущему контуру который мы хотим нарисовать
-//        for (int i = 0; ???) { // TODO 06 пробегите по всем точкам-пикселям этого контура
-//            cv::Point point = ???; // TODO 06 и взяв очередную точку-пиксель - нарисуйте выбранный цвет в этом пикселе картинки:
-//            imageWithContoursPoints.at<cv::Vec3b>(point.y, point.x) = cv::Vec3b(contourColor[0], contourColor[1], contourColor[2]);
-//        }
-//
-//    }
+    for (int contourI = 0; contourI < contoursPoints.size(); ++contourI) {
+        // сейчас мы смотрим на контур номер contourI
+
+        cv::Scalar contourColor = randColor(); // выберем для него случайный цвет
+        std::vector<cv::Point> points = contoursPoints[contourI]; // TODO 06 вытащите вектор из точек-пикселей соответствующих текущему контуру который мы хотим нарисовать
+        for (int i = 0; i < points.size();i++) { // TODO 06 пробегите по всем точкам-пикселям этого контура
+            cv::Point point = points[i]; // TODO 06 и взяв очередную точку-пиксель - нарисуйте выбранный цвет в этом пикселе картинки:
+            imageWithContoursPoints.at<cv::Vec3b>(point.y, point.x) = cv::Vec3b(contourColor[0], contourColor[1], contourColor[2]);
+        }
+
+    }
 
     return imageWithContoursPoints;
 }
@@ -60,13 +60,13 @@ void test(std::string name, std::string k) {
     cv::imwrite(out_path + "/01_grey.jpg", img);
 
     // TODO 01 выполните бинарный трешолдинг картинки, прочитайте документацию по функции cv::threshold и выберите значения аргументов
-//    cv::Mat binary;
-//    cv::threshold(img, binary, ???, ???, cv::THRESH_BINARY);
-//    cv::imwrite(out_path + "/02_binary_thresholding.jpg", binary);
+    cv::Mat binary;
+    cv::threshold(img, binary, 140, 255, cv::THRESH_BINARY);
+    cv::imwrite(out_path + "/02_binary_thresholding.jpg", binary);
 
     // TODO 02 выполните адаптивный бинарный трешолдинг картинки, прочитайте документацию по cv::adaptiveThreshold
-//    cv::adaptiveThreshold(img, binary, 255, ???, cv::THRESH_BINARY, ???, ???);
-//    cv::imwrite(out_path + "/03_adaptive_thresholding.jpg", binary);
+    cv::adaptiveThreshold(img, binary, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C , cv::THRESH_BINARY, 5, 10);
+    cv::imwrite(out_path + "/03_adaptive_thresholding.jpg", binary);
 
     // TODO 03 чтобы буквы не разваливались на кусочки - морфологическое расширение (эрозия)
 //    cv::Mat binary_eroded;
