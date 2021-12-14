@@ -161,8 +161,8 @@ void experiment2() {
         for (char letterB = 'a'; letterB <= 'z'; ++letterB) {
             if (letterA == letterB) continue;
             std::string tmp = letterDirA + "/" + std::to_string(letterA) + ".png";
-            cv::Mat a = cv::imread(letterDirA + "/" + std::to_string(2) + ".png");
-            cv::Mat b = cv::imread(letterDirA + "/" + std::to_string(2) + ".png");
+            cv::Mat a = cv::imread(letterDirA + "/" + std::to_string(letterA) + ".png");
+            cv::Mat b = cv::imread(letterDirA + "/" + std::to_string(letterB) + ".png");
             HoG hogA = buildHoG(a);
             HoG hogB = buildHoG(b);
             if(distance(hogA, hogB)>distMax){
