@@ -65,19 +65,19 @@ void test(std::string name, std::string k) {
     cv::imwrite(out_path + "/02_binary_thresholding.jpg", binary);
 
     // TODO 02 выполните адаптивный бинарный трешолдинг картинки, прочитайте документацию по cv::adaptiveThreshold
-    cv::adaptiveThreshold(img, binary, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C , cv::THRESH_BINARY, 7, 10);
+    cv::adaptiveThreshold(img, binary, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C , cv::THRESH_BINARY_INV, 7, 10);
     cv::imwrite(out_path + "/03_adaptive_thresholding.jpg", binary);
 
     // TODO 03 чтобы буквы не разваливались на кусочки - морфологическое расширение (эрозия)
     cv::Mat binary_eroded;
     cv::Mat binary1;
-    cv::dilate(binary, binary1, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2, 2)));
-    cv::erode(binary1, binary_eroded, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5)));
+    cv::erode(binary, binary1, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2, 2)));
+    cv::dilate(binary1, binary_eroded, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5)));
     cv::imwrite(out_path + "/04_erode.jpg", binary_eroded);
 
     // TODO 03 заодно давайте посмотрим что делает морфологическое сужение (диляция)
     cv::Mat binary_dilated;
-    cv::dilate(binary_eroded, binary_dilated, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2, 2)));
+    cv::erode(binary_eroded, binary_dilated, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2, 2)));
     cv::imwrite(out_path + "/05_dilate.jpg", binary_dilated);
 
     // TODO 04 дальше работаем с картинкой после морфологичесокго рашсирения или морфологического сжатия - на ваш выбор, подумайте и посмотрите на картинки
@@ -86,7 +86,7 @@ void test(std::string name, std::string k) {
     // TODO 05
     std::vector<std::vector<cv::Point>> contoursPoints; // по сути это вектор, где каждый элемент - это одна связная компонента-контур,
                                                         // а что такое компонента-контур? это вектор из точек (из пикселей)
-    cv::findContours(binary, contoursPoints, cv::RETR_LIST  ,cv::CHAIN_APPROX_NONE  ); // TODO подумайте, какие нужны два последних параметра? прочитайте документацию, после реализации отрисовки контура - поиграйте с этими параметрами чтобы посмотреть как меняется результат
+    cv::findContours(binary, contoursPoints, cv::RETR_EXTERNAL  ,cv::CHAIN_APPROX_NONE  ); // TODO подумайте, какие нужны два последних параметра? прочитайте документацию, после реализации отрисовки контура - поиграйте с этими параметрами чтобы посмотреть как меняется результат
     std::cout << "Contours: " << contoursPoints.size() << std::endl;
     cv::Mat imageWithContoursPoints = drawContours(img.rows, img.cols, contoursPoints); // TODO 06 реализуйте функцию которая покажет вам как выглядят найденные контура
     cv::imwrite(out_path + "/06_contours_points.jpg", imageWithContoursPoints);
@@ -119,6 +119,15 @@ void test(std::string name, std::string k) {
 }
 
 void finalExperiment(std::string name, std::string k) {
+    std::cout << "Processing " << name << "/" << k << "..." << std::endl;
+
+    std::string full_path = "lesson11/data/" + name + "/" + k + ".png";
+
+    // создаем папочки в которые будем сохранять картинки с промежуточными результатами
+    std::filesystem::create_directory("lesson11/resultsData/" + name);
+    std::string out_path = "lesson11/resultsData/" + name + "/" + k;
+    std::filesystem::create_directory(out_path);
+    std::vector<cv::Mat> symbols = splitSymbols(out_path + "/05_dilate.jpg");
     // TODO 100:
     // 1) вытащите результат которым вы довольны в функцию splitSymbols в parseSymbols.h/parseSymbols.cpp
     //    эта функция должна находить контуры букв и извлекать кусочки картинок в вектор
