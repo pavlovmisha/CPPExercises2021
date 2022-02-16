@@ -58,6 +58,26 @@ void run() {
     const int INF = std::numeric_limits<int>::max();
 
     std::vector<int> distances(nvertices, INF);
+    distances[start]=0;
+    std::vector<int> q(nvertices, 0);
+    std::vector<int> pred(nvertices, -1);
+    for(int j=0;j<nvertices;j++){
+        int min_d=INF;
+        int min_v;
+        for(int i=0;i<nvertices;i++){
+            if((distances[i]<min_d)&&(q[i]=0)){
+                min_v=i;
+                min_d=distances[i];
+            }
+        }
+        for(int i=0;i<edges_by_vertex[min_v].size();i++){
+            if(distances[edges_by_vertex[min_v][i].v]>min_d+edges_by_vertex[min_v][i].w){
+                distances[edges_by_vertex[min_v][i].v]=min_d+edges_by_vertex[min_v][i].w;
+                pred[i]=min_v;
+            }
+        }
+        q[min_v]=1;
+    }
     // TODO ...
 
 //    while (true) {
