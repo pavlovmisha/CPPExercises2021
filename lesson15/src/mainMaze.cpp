@@ -30,8 +30,8 @@ int encodeVertex(int row, int column, int nrows, int ncolumns) {
 cv::Point2i decodeVertex(int vertexId, int nrows, int ncolumns) {
 
     // TODO: придумайте как найти номер строки и столбика пикселю по номеру вершины (просто поймите предыдущую функцию и эта функция не будет казаться сложной)
-    int row = -1;
-    int column = -1;
+    int row = vertexId/ncolumns;
+    int column = vertexId-row*ncolumns;
 
     // сверим что функция симметрично сработала:
     rassert(encodeVertex(row, column, nrows, ncolumns) == vertexId, 34782974923035);
@@ -47,7 +47,7 @@ void run(int mazeNumber) {
     rassert(maze.type() == CV_8UC3, 3447928472389020);
     std::cout << "Maze resolution: " << maze.cols << "x" << maze.rows << std::endl;
 
-    int nvertices = 0; // TODO
+    int nvertices = maze.cols*maze.rows; // TODO
 
     std::vector<std::vector<Edge>> edges_by_vertex(nvertices);
     for (int j = 0; j < maze.rows; ++j) {
@@ -56,7 +56,13 @@ void run(int mazeNumber) {
             unsigned char blue = color[0];
             unsigned char green = color[1];
             unsigned char red = color[2];
+            if((i>0)&&(j>0)&&(i<maze.cols-1)&&(j<maze.rows-1)){
 
+                edges_by_vertex[j*maze.cols+i].push_back(Edge(j*maze.cols+i, j*maze.cols+i+1, abs(red+green+blue-maze.at<cv::Vec3b>(j, i+1)[0]-maze.at<cv::Vec3b>(j, i+1)[1]-maze.at<cv::Vec3b>(j, i+1)[2])));
+                edges_by_vertex[j*maze.cols+i].push_back(Edge(j*maze.cols+i, j*maze.cols+i-1, abs(red+green+blue-maze.at<cv::Vec3b>(j, i-1)[0]-maze.at<cv::Vec3b>(j, i-1)[1]-maze.at<cv::Vec3b>(j, i-1)[2])));
+                edges_by_vertex[j*maze.cols+i].push_back(Edge(j*maze.cols+i, j*maze.cols+i+maze.cols, abs(red+green+blue-maze.at<cv::Vec3b>(j+1, i)[0]-maze.at<cv::Vec3b>(j+1, i)[1]-maze.at<cv::Vec3b>(j+1, i)[2])));
+                edges_by_vertex[j*maze.cols+i].push_back(Edge(j*maze.cols+i, j*maze.cols+i-maze.cols, abs(red+green+blue-maze.at<cv::Vec3b>(j-1, i)[0]-maze.at<cv::Vec3b>(j-1, i)[1]-maze.at<cv::Vec3b>(j-1, i)[2])));
+            }
             // TODO добавьте соотвтетсвующие этому пикселю ребра
         }
     }
@@ -80,6 +86,35 @@ void run(int mazeNumber) {
     cv::Mat window = maze.clone(); // на этой картинке будем визуализировать до куда сейчас дошла прокладка маршрута
 
     std::vector<int> distances(nvertices, INF);
+    distances[start]=0;
+    std::vector<int> q(nvertices, 0);
+    std::vector<int> pred(nvertices, -1);
+    while (q[finish]==0){
+        int min_d=INF;
+        int min_v;
+        for(int i=0;i<nvertices;i++){
+            if((distances[i]<min_d)&&(q[i]==0)){
+                min_v=i;
+                min_d=distances[i];
+            }
+        }
+        for(int i=0;i<edges_by_vertex[min_v].size();i++){
+            if(distances[edges_by_vertex[min_v][i].v]>min_d+edges_by_vertex[min_v][i].w){
+                distances[edges_by_vertex[min_v][i].v]=min_d+edges_by_vertex[min_v][i].w;
+                pred[edges_by_vertex[min_v][i].v]=min_v;
+            }
+        }
+        q[min_v]=1;
+    }
+
+    int a=finish;
+    while(a!=-1){
+        cv::Point2i p = decodeVertex(a, maze.rows, maze.cols);
+            window.at<cv::Vec3b>(p.y, p.x) = cv::Vec3b(0, 0, 255);
+            cv::imshow("Maze", window);
+            cv::waitKey(1);
+        a=pred[a];
+    }
     // TODO СКОПИРУЙТЕ СЮДА ДЕЙКСТРУ ИЗ ПРЕДЫДУЩЕГО ИСХОДНИКА
 
     // TODO в момент когда вершина становится обработанной - красьте ее на картинке window в зеленый цвет и показывайте картинку:
