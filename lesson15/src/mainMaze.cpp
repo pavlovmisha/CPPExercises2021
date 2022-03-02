@@ -58,10 +58,10 @@ void run(int mazeNumber) {
             unsigned char red = color[2];
             if((i>0)&&(j>0)&&(i<maze.cols-1)&&(j<maze.rows-1)){
 
-                edges_by_vertex[j*maze.cols+i].push_back(Edge(j*maze.cols+i, j*maze.cols+i+1, abs(red+green+blue-maze.at<cv::Vec3b>(j, i+1)[0]-maze.at<cv::Vec3b>(j, i+1)[1]-maze.at<cv::Vec3b>(j, i+1)[2])));
-                edges_by_vertex[j*maze.cols+i].push_back(Edge(j*maze.cols+i, j*maze.cols+i-1, abs(red+green+blue-maze.at<cv::Vec3b>(j, i-1)[0]-maze.at<cv::Vec3b>(j, i-1)[1]-maze.at<cv::Vec3b>(j, i-1)[2])));
-                edges_by_vertex[j*maze.cols+i].push_back(Edge(j*maze.cols+i, j*maze.cols+i+maze.cols, abs(red+green+blue-maze.at<cv::Vec3b>(j+1, i)[0]-maze.at<cv::Vec3b>(j+1, i)[1]-maze.at<cv::Vec3b>(j+1, i)[2])));
-                edges_by_vertex[j*maze.cols+i].push_back(Edge(j*maze.cols+i, j*maze.cols+i-maze.cols, abs(red+green+blue-maze.at<cv::Vec3b>(j-1, i)[0]-maze.at<cv::Vec3b>(j-1, i)[1]-maze.at<cv::Vec3b>(j-1, i)[2])));
+                edges_by_vertex[j*maze.cols+i].push_back(Edge(j*maze.cols+i, j*maze.cols+i+1, abs(red+green+blue+1-maze.at<cv::Vec3b>(j, i+1)[0]-maze.at<cv::Vec3b>(j, i+1)[1]-maze.at<cv::Vec3b>(j, i+1)[2])));
+                edges_by_vertex[j*maze.cols+i].push_back(Edge(j*maze.cols+i, j*maze.cols+i-1, abs(red+green+blue+1-maze.at<cv::Vec3b>(j, i-1)[0]-maze.at<cv::Vec3b>(j, i-1)[1]-maze.at<cv::Vec3b>(j, i-1)[2])));
+                edges_by_vertex[j*maze.cols+i].push_back(Edge(j*maze.cols+i, j*maze.cols+i+maze.cols, abs(red+green+blue+1-maze.at<cv::Vec3b>(j+1, i)[0]-maze.at<cv::Vec3b>(j+1, i)[1]-maze.at<cv::Vec3b>(j+1, i)[2])));
+                edges_by_vertex[j*maze.cols+i].push_back(Edge(j*maze.cols+i, j*maze.cols+i-maze.cols, abs(red+green+blue+1-maze.at<cv::Vec3b>(j-1, i)[0]-maze.at<cv::Vec3b>(j-1, i)[1]-maze.at<cv::Vec3b>(j-1, i)[2])));
             }
             // TODO добавьте соотвтетсвующие этому пикселю ребра
         }

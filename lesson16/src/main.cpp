@@ -13,10 +13,15 @@
 
 bool isPixelEmpty(cv::Vec3b color) {
     // TODO 1 реализуйте isPixelEmpty(color):
+    if((color[0]==0)&&(color[1]==0)&&(color[2]==0)){
+        return true;
+    }else{
+        return false;
+    }
     // - верните true если переданный цвет - полностью черный (такие пиксели мы считаем пустыми)
     // - иначе верните false
     rassert(false, "325235141242153: You should do TODO 1 - implement isPixelEmpty(color)!");
-    return true;
+
 }
 
 void run(std::string caseName) {
@@ -130,6 +135,25 @@ void run(std::string caseName) {
     // (т.е. эта функция позволит дальше понимать в этот пиксель наложилась исходная картинка или же там все еще тьма)
 
     cv::Mat panoDiff(pano_rows, pano_cols, CV_8UC3, cv::Scalar(0, 0, 0));
+    for(int i=0;i<pano_cols;i++){
+        for(int j=0;j<pano_rows;j++){
+            if(isPixelEmpty(pano0.at<cv::Vec3d>(i,j))){
+                if(isPixelEmpty(pano1.at<cv::Vec3d>(i,j))){
+                    panoDiff.at<cv::Vec3b>(j, i) = cv::Vec3b(255, 255, 255);
+                }else{
+                    panoDiff.at<cv::Vec3b>(j, i) = cv::Vec3b(0, 0, 0);
+                }
+            }else{
+                if(isPixelEmpty(pano1.at<cv::Vec3d>(i,j))){
+                    panoDiff.at<cv::Vec3b>(j, i) = cv::Vec3b(0, 0, 0);
+                }else{
+                    cv::Vec3d s0 = isPixelEmpty(pano0.at<cv::Vec3d>(i,j));
+                    cv::Vec3d s1 = isPixelEmpty(pano1.at<cv::Vec3d>(i,j));
+                    panoDiff.at<cv::Vec3b>(j, i) = cv::Vec3b(s0[0]-s1[0], s0[1]-s1[1], s0[2]-s1[2]);
+                }
+            }
+        }
+    }
     // TODO 2 вам надо заполнить panoDiff картинку так чтобы было четко ясно где pano0 картинка (объявлена выше) и pano1 картинка отличаются сильно, а где - слабо:
     // сравните в этих двух картинках пиксели по одинаковым координатам (т.е. мы сверяем картинки) и покрасьте соответствующий пиксель panoDiff по этой логике:
     // - если оба пикселя пустые - проверяйте это через isPixelEmpty(color) (т.е. цвета черные) - результат тоже пусть черный
