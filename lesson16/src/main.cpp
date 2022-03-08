@@ -135,21 +135,21 @@ void run(std::string caseName) {
     // (т.е. эта функция позволит дальше понимать в этот пиксель наложилась исходная картинка или же там все еще тьма)
 
     cv::Mat panoDiff(pano_rows, pano_cols, CV_8UC3, cv::Scalar(0, 0, 0));
-    for(int i=0;i<pano_cols;i++){
-        for(int j=0;j<pano_rows;j++){
-            if(isPixelEmpty(pano0.at<cv::Vec3d>(i,j))){
-                if(isPixelEmpty(pano1.at<cv::Vec3d>(i,j))){
-                    panoDiff.at<cv::Vec3b>(j, i) = cv::Vec3b(255, 255, 255);
+    for(int j=0;j<pano_cols;j++){
+        for(int i=0;i<pano_rows;i++){
+            if(isPixelEmpty(pano0.at<cv::Vec3d>(j,i))){
+                if(isPixelEmpty(pano1.at<cv::Vec3d>(j,i))){
+                    panoDiff.at<cv::Vec3b>(j, i) = cv::Vec3b (255, 255, 255);
                 }else{
                     panoDiff.at<cv::Vec3b>(j, i) = cv::Vec3b(0, 0, 0);
                 }
             }else{
-                if(isPixelEmpty(pano1.at<cv::Vec3d>(i,j))){
+                if(isPixelEmpty(pano1.at<cv::Vec3d>(j,i))){
                     panoDiff.at<cv::Vec3b>(j, i) = cv::Vec3b(0, 0, 0);
                 }else{
-                    cv::Vec3d s0 = isPixelEmpty(pano0.at<cv::Vec3d>(i,j));
-                    cv::Vec3d s1 = isPixelEmpty(pano1.at<cv::Vec3d>(i,j));
-                    panoDiff.at<cv::Vec3b>(j, i) = cv::Vec3b(s0[0]-s1[0], s0[1]-s1[1], s0[2]-s1[2]);
+                    cv::Vec3d s0 = isPixelEmpty(pano0.at<cv::Vec3d>(j,i));
+                    cv::Vec3d s1 = isPixelEmpty(pano1.at<cv::Vec3d>(j,i));
+                    panoDiff.at<cv::Vec3b>(j, i) = cv::Vec3b(abs(s0[0]-s1[0]), abs(s0[1]-s1[1]), abs(s0[2]-s1[2]));
                 }
             }
         }
