@@ -14,7 +14,11 @@
 
 
 bool isPixelEmpty(cv::Vec3b color) {
-    return false; // TODO скопируйте эту функцию из прошлого задания про построение картинки-визуализации разницы картинок
+    if((color[0]==0)&&(color[1]==0)&&(color[2]==0)){
+        return true;
+    }else{
+        return false;
+    } // TODO скопируйте эту функцию из прошлого задания про построение картинки-визуализации разницы картинок
 }
 
 // Эта функция построит лабиринт - в каждом пикселе будет число которое говорит насколько длинное или короткое ребро выходит из пикселя
@@ -56,13 +60,20 @@ struct Edge {
 
 int encodeVertex(int row, int column, int nrows, int ncolumns) {
     // TODO скопируйте эту функцию из задания про Дейкстру на картинке лабиринта
-    return 0;
+    rassert(row < nrows, 348723894723980017);
+    rassert(column < ncolumns, 347823974239870018);
+    int vertexId = row * ncolumns + column;
+    return vertexId;
 }
 
 cv::Point2i decodeVertex(int vertexId, int nrows, int ncolumns) {
     // TODO скопируйте эту функцию из задания про Дейкстру на картинке лабиринта
-    int column = 0;
-    int row = 0;
+    int row = vertexId/ncolumns;
+    int column = vertexId-row*ncolumns;
+    // сверим что функция симметрично сработала:
+    rassert(encodeVertex(row, column, nrows, ncolumns) == vertexId, 34782974923035);
+    rassert(row < nrows, 34723894720027);
+    rassert(column < ncolumns, 3824598237592030);
     return cv::Point2i(column, row);
 }
 

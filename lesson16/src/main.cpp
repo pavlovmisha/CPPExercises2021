@@ -135,25 +135,27 @@ void run(std::string caseName) {
     // (т.е. эта функция позволит дальше понимать в этот пиксель наложилась исходная картинка или же там все еще тьма)
 
     cv::Mat panoDiff(pano_rows, pano_cols, CV_8UC3, cv::Scalar(0, 0, 0));
-    for(int j=0;j<pano_cols;j++){
-        for(int i=0;i<pano_rows;i++){
-            if(isPixelEmpty(pano0.at<cv::Vec3d>(j,i))){
-                if(isPixelEmpty(pano1.at<cv::Vec3d>(j,i))){
+    for(int j=0;j<pano_rows;j++){
+        for(int i=0;i<pano_cols;i++){
+            if(isPixelEmpty(pano0.at<cv::Vec3b>(j,i))){
+                if(isPixelEmpty(pano1.at<cv::Vec3b>(j,i))){
                     panoDiff.at<cv::Vec3b>(j, i) = cv::Vec3b (255, 255, 255);
                 }else{
                     panoDiff.at<cv::Vec3b>(j, i) = cv::Vec3b(0, 0, 0);
                 }
             }else{
-                if(isPixelEmpty(pano1.at<cv::Vec3d>(j,i))){
+                if(isPixelEmpty(pano1.at<cv::Vec3b>(j,i))){
                     panoDiff.at<cv::Vec3b>(j, i) = cv::Vec3b(0, 0, 0);
                 }else{
-                    cv::Vec3d s0 = isPixelEmpty(pano0.at<cv::Vec3d>(j,i));
-                    cv::Vec3d s1 = isPixelEmpty(pano1.at<cv::Vec3d>(j,i));
+                    cv::Vec3b s0 = pano0.at<cv::Vec3b>(j,i);
+                    cv::Vec3b s1 = pano1.at<cv::Vec3b>(j,i);
                     panoDiff.at<cv::Vec3b>(j, i) = cv::Vec3b(abs(s0[0]-s1[0]), abs(s0[1]-s1[1]), abs(s0[2]-s1[2]));
+
                 }
             }
         }
     }
+    cv::cvtColor(panoDiff, panoDiff, cv::COLOR_BGR2GRAY);
     // TODO 2 вам надо заполнить panoDiff картинку так чтобы было четко ясно где pano0 картинка (объявлена выше) и pano1 картинка отличаются сильно, а где - слабо:
     // сравните в этих двух картинках пиксели по одинаковым координатам (т.е. мы сверяем картинки) и покрасьте соответствующий пиксель panoDiff по этой логике:
     // - если оба пикселя пустые - проверяйте это через isPixelEmpty(color) (т.е. цвета черные) - результат тоже пусть черный
@@ -172,7 +174,7 @@ int main() {
         run("1_hanging"); // TODO 3 проанализируйте результаты по фотографиям с дрона - где различие сильное, где малое? почему так?
         run("2_hiking"); // TODO 4 проанализируйте результаты по фотографиям с дрона - где различие сильное, где малое? почему так?
         run("3_aero"); // TODO 5 проанализируйте результаты по фотографиям с дрона - где различие сильное, где малое? почему так?
-        run("4_your_data"); // TODO 6 сфотографируйте что-нибудь сами при этом на второй картинке что-то изменив, проведите анализ
+        //run("4_your_data"); // TODO 6 сфотографируйте что-нибудь сами при этом на второй картинке что-то изменив, проведите анализ
         // TODO 7 проведите анализ результатов на базе Вопросов-Упражнений предложенных в последней статье "Урок 19: панорама и визуализация качества склейки"
 
         return 0;
