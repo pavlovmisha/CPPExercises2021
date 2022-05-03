@@ -31,6 +31,10 @@ void perElementProcessing(std::vector<int> &data) {
 
 // многопоточная версия
 void perElementProcessingOMP(std::vector<int> &data) {
+    #pragma omp parallel for
+    for (int i = 0; i < data.size(); ++i) {
+        data[i] = sqrtf(std::abs(data[i] * 2.0f + 23.45f));
+    }
     // TODO сделайте многопоточную версию поэлементного преобразования чисел (по той же формуле что и обычная версия выше)
 }
 
@@ -43,13 +47,13 @@ void test1PerElementProcessing() {
     timer t; // запускаем таймер (на самом деле это секундомер, кек)
     perElementProcessing(data1);
     std::cout << "  Naive version:  " << t.elapsed() << " s" << std::endl; // выводим в консоль замер времени (в секундах)
-
+    float t1 = t.elapsed();
     t.restart(); // перезапускаем таймер
     perElementProcessingOMP(data2); // TODO сделайте многопоточную версию поэлементного умножения
     std::cout << "  OpenMP version: " << t.elapsed() << " s" << std::endl;
-
+    float t2 = t.elapsed();
     // TODO рассчитайте и выведите во сколько раз быстрее отработала OpenMP версия
-    float speedup = 0.0;
+    float speedup = t1/t2;
     std::cout << "  OpenMP speedup: x" << speedup << std::endl;
 
     // сверяем результаты (а то вдруг работает быстро не результат неправильный?)
@@ -102,8 +106,13 @@ void test2TotalSum() {
         t.restart(); // перезапускаем таймер
         sum = 0;
         // TODO сделайте эту версию параллельной (НАИВНО, без критической секции и без редукции)
+        #pragma omp parallel for
         for (int i = 0; i < data.size(); ++i) {
+            #pragma omp critical
+            sum += data[i];
+
         }
+
 
         // TODO Сначала посмотрите как она ведет себя в случае если тут есть состоянии гонки. Как отличается результат суммы? Почему так?
         rassert(sum == sumExpected,
@@ -115,6 +124,11 @@ void test2TotalSum() {
     {
         t.restart(); // перезапускаем таймер
         sum = 0;
+        #pragma omp parallel for  reduction(+: sum)
+        for (int i = 0; i < data.size(); ++i) {
+            sum += data[i];
+
+        }
         // TODO сделайте эту версию параллельной (с помощью OpenMP редукции)
 
         rassert(sum == sumExpected,
@@ -126,6 +140,25 @@ void test2TotalSum() {
     {
         t.restart(); // перезапускаем таймер
         sum = 0;
+        int threadsN = 0;
+        #pragma omp parallel // ЗДЕСЬ НЕТ for, но есть parallel = говорим что эту секцию хочется запустить для каждого потока процессора
+        {
+            int threadId = -1;
+            #pragma omp critical // в критической секции рассчитаемся по номерам потоков и выведем в консоль что такой-то поток был запущен
+            {
+                threadId = threadsN;
+                ++threadsN;
+            }
+            long long threadSum = 0;
+            #pragma omp for // ЗДЕСЬ НЕТ parallel, т.к. это ключевое слово говорит "запускай потоки", но потоки уже запущены,
+            for (int i = 0; i < data.size(); ++i) { // осталось лишь распределить среди них вычислительную рабочую нагрузку
+                threadSum += data[i]; // почему здесь не нужна критическая секция?
+            }
+            #pragma omp critical
+            {
+                sum += threadSum;
+            }
+        }
         // TODO сделайте эту версию параллельной (с помощью САМОПИСНОЙ редукции)
 
         rassert(sum == sumExpected,
@@ -172,6 +205,35 @@ void test3Top2ElementSearch() {
     #pragma omp parallel
     {
         // TODO сделайте многопоточную версию (используйте самописную редукцию)
+        int maxn1=0;
+        int maxn2=0;
+        #pragma omp for
+        for (int i = 0; i < n; ++i) {
+            int value = data[i];
+            if (value > maxn1) { // если текущее значение больше самого большого
+                maxn2 = maxn1;    // то число которое раньше было самым большим - становится вторым по величине
+                maxn1 = value;   // а текущее значение становится самым большим
+            } else {            // иначе:
+                if (value > maxn2) { // если текущее значение больше хотя бы второго по величине
+                    maxn2 = value;   // то заменяем его
+                }
+            }
+        }
+        #pragma omp critical
+        {
+            if (maxn1 > max1) {
+                max2 = max1;
+                max1 = maxn1;
+
+            } else {
+                if (maxn1 > max2) {
+                    max2 = maxn1;
+                }
+            }
+            if(maxn2 > max2){
+                max2 = maxn2;
+            }
+        }
     }
     rassert(max1 == max1Expected && max2 == max2Expected,
             "Wrong! Expected: " + std::to_string(max1Expected) + " and " + std::to_string(max2Expected)
