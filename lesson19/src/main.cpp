@@ -210,12 +210,12 @@ void test3Top2ElementSearch() {
         #pragma omp for
         for (int i = 0; i < n; ++i) {
             int value = data[i];
-            if (value > maxn1) { // если текущее значение больше самого большого
-                maxn2 = maxn1;    // то число которое раньше было самым большим - становится вторым по величине
-                maxn1 = value;   // а текущее значение становится самым большим
-            } else {            // иначе:
-                if (value > maxn2) { // если текущее значение больше хотя бы второго по величине
-                    maxn2 = value;   // то заменяем его
+            if (value > maxn1) {
+                maxn2 = maxn1;
+                maxn1 = value;
+            } else {
+                if (value > maxn2) {
+                    maxn2 = value;
                 }
             }
         }
